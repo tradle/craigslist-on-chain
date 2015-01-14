@@ -1,5 +1,5 @@
 {
-	"name": "popcorn-time",
+	"name": "tradle-craigslist",
 	"dependencies": {
 		"marionette": "~1.8.3",
 		"bootstrap": "~3.1.1",

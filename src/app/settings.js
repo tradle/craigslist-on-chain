@@ -29,7 +29,7 @@ Settings.playNextEpisodeAuto = true;
 Settings.alwaysOnTop = false;
 Settings.theme = 'Official_-_Dark_theme';
 Settings.ratingStars = true; //trigger on click in details
-Settings.startScreen = 'Movies';
+Settings.startScreen = 'Tickets';
 Settings.lastTab = '';
 
 // Movies
@@ -57,7 +57,7 @@ Settings.syncOnStart = false;
 Settings.connectionLimit = 100;
 Settings.dhtLimit = 500;
 Settings.streamPort = 0; // 0 = Random
-Settings.tmpLocation = path.join(os.tmpDir(), 'Popcorn-Time');
+Settings.tmpLocation = path.join(os.tmpDir(), 'Craigslist-Time');
 Settings.databaseLocation = path.join(data_path, 'data');
 Settings.deleteTmpOnClose = true;
 

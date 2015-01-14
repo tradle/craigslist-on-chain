@@ -52,6 +52,8 @@
 			this.nativeWindow = require('nw.gui').Window.get();
 
 			// Application events
+			App.vent.on('tickets:list', _.bind(this.showTickets, this));
+			App.vent.on('identities:list', _.bind(this.showIdentities, this));
 			App.vent.on('movies:list', _.bind(this.showMovies, this));
 			App.vent.on('shows:list', _.bind(this.showShows, this));
 			App.vent.on('anime:list', _.bind(this.showAnime, this));
@@ -77,6 +79,16 @@
 			App.vent.on('help:show', _.bind(this.showHelp, this));
 			App.vent.on('help:close', _.bind(this.Help.close, this.Help));
 			App.vent.on('help:toggle', _.bind(this.toggleHelp, this));
+
+			// Listings
+			App.vent.on('ticket:showDetail', _.bind(this.showTicketDetail, this));
+			App.vent.on('ticket:closeDetail', _.bind(this.closeTicketDetail, this.MovieDetail));
+			// App.vent.on('apartment:showDetail', _.bind(this.showApartmentDetail, this));
+			// App.vent.on('apartment:closeDetail', _.bind(this.closeApartmentDetail, this.MovieDetail));
+
+			// Identities
+			App.vent.on('identity:showDetail', _.bind(this.showIdentityDetail, this));
+			App.vent.on('identity:closeDetail', _.bind(this.closeIdentityDetail, this.MovieDetail));
 
 			// Movies
 			App.vent.on('movie:showDetail', _.bind(this.showMovieDetail, this));
@@ -113,6 +125,32 @@
 			s.render();
 		},
 
+		showScreen: function (screen) {
+			switch (screen) {
+			case 'Identities':
+				this.showIdentities();
+				break;
+			case 'Tickets':
+				this.showTickets();
+				break;
+			case 'Watchlist':
+				this.showWatchlist();
+				break;
+			case 'Favorites':
+				this.showFavorites();
+				break;
+			case 'TV Series':
+				this.showShows();
+				break;
+			case 'Anime':
+				this.showAnime();
+				break;
+			default:
+				this.showTickets();
+				break;
+			}
+		},
+
 		onShow: function () {
 			this.Header.show(new App.View.TitleBar());
 			// Set the app title (for Windows mostly)
@@ -141,17 +179,7 @@
 
 					that.InitModal.close();
 
-					if (AdvSettings.get('startScreen') === 'Watchlist') {
-						that.showWatchlist();
-					} else if (AdvSettings.get('startScreen') === 'Favorites') {
-						that.showFavorites();
-					} else if (AdvSettings.get('startScreen') === 'TV Series') {
-						that.showShows();
-					} else if (AdvSettings.get('startScreen') === 'Anime') {
-						that.showAnime();
-					} else {
-						that.showMovies();
-					}
+					that.showScreen(AdvSettings.get('startScreen'));
 
 					// Focus the window when the app opens
 					that.nativeWindow.focus();
@@ -176,6 +204,20 @@
 			App.vent.trigger('updatePostersSizeStylesheet');
 			App.vent.trigger('main:ready');
 
+		},
+
+		showTickets: function (e) {
+			this.Settings.close();
+			this.MovieDetail.close();
+
+			this.Content.show(new App.View.TicketBrowser());
+		},
+
+		showIdentities: function (e) {
+			this.Settings.close();
+			this.MovieDetail.close();
+
+			this.Content.show(new App.View.IdentityBrowser());
 		},
 
 		showMovies: function (e) {
@@ -280,6 +322,28 @@
 
 		preventDefault: function (e) {
 			e.preventDefault();
+		},
+
+		showTicketDetail: function (listingModel) {
+			this.MovieDetail.show(new App.View.TicketDetail({
+				model: listingModel
+			}));
+		},
+
+		closeTicketDetail: function (listingModel) {
+			_this.MovieDetail.close();
+			App.vent.trigger('shortcuts:tickets');
+		},
+
+		showIdentityDetail: function (identityModel) {
+			this.MovieDetail.show(new App.View.IdentityDetail({
+				model: identityModel
+			}));
+		},
+
+		closeIdentityDetail: function (identityModel) {
+			_this.MovieDetail.close();
+			App.vent.trigger('shortcuts:identities');
 		},
 
 		showMovieDetail: function (movieModel) {

@@ -35,6 +35,28 @@ var
 
 // Special Debug Console Calls!
 win.log = console.log.bind(console);
+
+// function colorize = function() {
+// 	var colors = require('colors');
+// 	var mapping = {
+// 	  normal: 'cyan',
+// 	  warn: 'yellow',
+// 	  debug: 'blue',
+// 	  error: 'red'
+// 	};
+
+// 	["log", "warn", "error"].forEach(function(method) {
+//     var oldMethod = console[method].bind(console);
+//     console[method] = function() {
+//       oldMethod.apply(
+//           console,
+//           [mapping[method](new Date().toISOString())]
+//               .concat(arguments)
+//       );
+//     };
+// 	});
+// }
+
 win.debug = function () {
 	var params = Array.prototype.slice.call(arguments, 1);
 	params.unshift('%c[%cDEBUG%c] %c' + arguments[0], 'color: black;', 'color: green;', 'color: black;', 'color: blue;');
@@ -103,6 +125,15 @@ _.extend(App, {
 	Providers: {},
 	Localization: {}
 });
+
+document.addEventListener('click', function (e) {
+	var target = e.target;
+	var tagName = target.tagName || '';
+	if (tagName.toUpperCase() === 'A' && target.classList.contains('links')) {
+		e.preventDefault();
+		gui.Shell.openExternal(target.href);
+	}
+}, true);
 
 // set database
 App.db = Database;
@@ -194,6 +225,18 @@ var initApp = function () {
 		console.error('Couldn\'t start app: ', e, e.stack);
 	}
 };
+
+// App.addInitializer(function (options) {
+// 	var express = require('express');
+// 	var app = express();
+
+// 	var bitjoeApp = require('../../node_modules/node-bitjoe/app');
+// 	var keeperApp = require('../../node_modules/node-bitkeeper/app');
+
+// 	app.use('/bitjoe', bitjoeApp);
+// 	app.use('/keeper', keeperApp);
+// 	App.tradleServer = app.listen(8001);
+// });
 
 App.addInitializer(function (options) {
 	initTemplates()
@@ -452,3 +495,14 @@ if (gui.App.fullArgv.indexOf('-f') !== -1) {
 process.on('uncaughtException', function (err) {
 	window.console.error(err, err.stack);
 });
+
+win.on('close', function (code) {
+	App.vent('close');
+});
+
+// function cleanup() {
+// 	if (App.tradleServer) App.tradleServer.close();
+// }
+
+// process.on('SIGINT', cleanup);
+// process.on('SIGTERM', cleanup);

@@ -57,6 +57,11 @@
 				watched = App.watchedMovies.indexOf(imdb) !== -1;
 				this.model.set('image', resizeImage(img, '300'));
 				break;
+			case 'ticket':
+			case 'identity':
+				watched = false;
+				this.model.set('image', resizeImage(img, '300'));
+				break;
 			}
 			this.model.set('watched', watched);
 			this.model.set('bookmarked', bookmarked);
@@ -132,7 +137,14 @@
 					this.ui.bookmarkIcon.addClass('selected');
 				}
 				break;
+			case 'ticket':
+				this.ui.cover.css('background-image', 'url(' + this.model.get('images').poster + ')').addClass('fadein');
+				break;
+			case 'identity':
+				this.ui.cover.css('background-image', 'url(' + this.model.get('image') + ')').addClass('fadein');
+				break;
 			}
+
 			this.ui.coverImage.remove();
 
 			this.ui.watchedIcon.tooltip({
@@ -145,6 +157,9 @@
 
 		showDetail: function (e) {
 			e.preventDefault();
+			var Type;
+			var provider;
+			var data;
 			var type = this.model.get('type');
 			switch (type) {
 			case 'bookmarkedmovie':
@@ -174,11 +189,11 @@
 				/* falls through */
 			case 'show':
 			case 'movie':
-				var Type = type.charAt(0).toUpperCase() + type.slice(1);
+				Type = type.charAt(0).toUpperCase() + type.slice(1);
 				this.model.set('health', false);
 				$('.spinner').show();
-				var provider = App.Providers.get(this.model.get('provider'));
-				var data = provider.detail(this.model.get('imdb_id'), this.model.attributes)
+				provider = App.Providers.get(this.model.get('provider'));
+				data = provider.detail(this.model.get('imdb_id'), this.model.attributes)
 					.catch(function () {
 						alert('Somethings wrong... try later');
 					})
@@ -188,7 +203,34 @@
 						App.vent.trigger(type + ':showDetail', new App.Model[Type](data));
 					});
 				break;
-
+			case 'ticket':
+				Type = 'Listing'; ////type.charAt(0).toUpperCase() + type.slice(1);
+				$('.spinner').show();
+				provider = App.Providers.get(this.model.get('provider'));
+				data = provider.detail(this.model.get('id'), this.model.attributes)
+					.catch(function () {
+						alert('Somethings wrong... try later');
+					})
+					.then(function (data) {
+						data.provider = provider.name;
+						$('.spinner').hide();
+						App.vent.trigger(type + ':showDetail', new App.Model[Type](data));
+					});
+				break;
+			case 'identity':
+				Type = 'Identity'; ////type.charAt(0).toUpperCase() + type.slice(1);
+				$('.spinner').show();
+				provider = App.Providers.get(this.model.get('provider'));
+				data = provider.detail(this.model.get('id'), this.model.attributes)
+					.catch(function () {
+						alert('Somethings wrong... try later');
+					})
+					.then(function (data) {
+						data.provider = provider.name;
+						$('.spinner').hide();
+						App.vent.trigger(type + ':showDetail', new App.Model[Type](data));
+					});
+				break;
 			}
 
 		},

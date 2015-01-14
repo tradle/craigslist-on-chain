@@ -5,7 +5,6 @@ var
 	Datastore = require('nedb'),
 	path = require('path'),
 	Q = require('q'),
-
 	db = {},
 	data_path = require('nw.gui').App.dataPath,
 	TTL = 1000 * 60 * 60 * 24;
@@ -35,6 +34,18 @@ db.watched = new Datastore({
 	filename: path.join(data_path, 'data/watched.db'),
 	autoload: true
 });
+db.craigslistCities = new Datastore({
+	filename: path.join(data_path, 'data/craigslist-cities.db'),
+	autoload: true
+});
+db.craigslistCategories = new Datastore({
+	filename: path.join(data_path, 'data/craigslist-categories.db'),
+	autoload: true
+});
+db.craigslistTickets = new Datastore({
+	filename: path.join(data_path, 'data/craigslist-tickets.db'),
+	autoload: true
+});
 
 function promisifyDatastore(datastore) {
 	datastore.insert = Q.denodeify(datastore.insert, datastore);
@@ -46,11 +57,14 @@ promisifyDatastore(db.bookmarks);
 promisifyDatastore(db.settings);
 promisifyDatastore(db.tvshows);
 promisifyDatastore(db.movies);
+promisifyDatastore(db.craigslistCities);
+promisifyDatastore(db.craigslistCategories);
+promisifyDatastore(db.craigslistTickets);
 promisifyDatastore(db.watched);
 
 // Create unique indexes for the various id's for shows and movies
 db.tvshows.ensureIndex({
-	fieldName: 'imdb_id',
+	fieldName: 'id',
 	unique: true
 });
 db.tvshows.ensureIndex({
@@ -58,13 +72,29 @@ db.tvshows.ensureIndex({
 	unique: true
 });
 db.movies.ensureIndex({
-	fieldName: 'imdb_id',
+	fieldName: 'id',
 	unique: true
 });
+db.craigslistCities.ensureIndex({
+	fieldName: 'id',
+	unique: true
+});
+db.craigslistCategories.ensureIndex({
+	fieldName: 'id',
+	unique: true
+});
+db.craigslistTickets.ensureIndex({
+	fieldName: 'id',
+	unique: true
+});
+db.movies.removeIndex('id');
 db.movies.removeIndex('imdb_id');
 db.movies.removeIndex('tmdb_id');
+db.craigslistCities.removeIndex('id');
+db.craigslistCategories.removeIndex('id');
+db.craigslistTickets.removeIndex('id');
 db.bookmarks.ensureIndex({
-	fieldName: 'imdb_id',
+	fieldName: 'id',
 	unique: true
 });
 
@@ -75,7 +105,7 @@ db.settings.ensureIndex({
 });
 
 var extractIds = function (items) {
-	return _.pluck(items, 'imdb_id');
+	return _.pluck(items, 'id');
 };
 
 var extractMovieIds = function (items) {
@@ -100,37 +130,37 @@ var Database = {
 		return db.movies.insert(data);
 	},
 
-	deleteMovie: function (imdb_id) {
+	deleteMovie: function (id) {
 		return db.movies.remove({
-			imdb_id: imdb_id
+			id: id
 		});
 	},
 
-	getMovie: function (imdb_id) {
+	getMovie: function (id) {
 		return promisifyDb(db.movies.findOne({
-			imdb_id: imdb_id
+			id: id
 		}));
 	},
 
-	addBookmark: function (imdb_id, type) {
-		App.userBookmarks.push(imdb_id);
+	addBookmark: function (id, type) {
+		App.userBookmarks.push(id);
 		return db.bookmarks.insert({
-			imdb_id: imdb_id,
+			id: id,
 			type: type
 		});
 	},
 
-	deleteBookmark: function (imdb_id) {
-		App.userBookmarks.splice(App.userBookmarks.indexOf(imdb_id), 1);
+	deleteBookmark: function (id) {
+		App.userBookmarks.splice(App.userBookmarks.indexOf(id), 1);
 		return db.bookmarks.remove({
-			imdb_id: imdb_id
+			id: id
 		});
 	},
 
-	getBookmark: function (imdb_id) {
+	getBookmark: function (id) {
 		win.warn('what is this even supposed to do? It isn\'t used anywhere');
 		return promisifyDb(db.bookmarks.findOne({
-			imdb_id: imdb_id
+			id: id
 		}));
 	},
 
@@ -188,14 +218,14 @@ var Database = {
 	},
 
 	markMovieAsWatched: function (data, trakt) {
-		if (data.imdb_id) {
+		if (data.id) {
 			if (trakt !== false) {
-				App.Trakt.movie.seen(data.imdb_id);
+				App.Trakt.movie.seen(data.id);
 			}
-			App.watchedMovies.push(data.imdb_id);
+			App.watchedMovies.push(data.id);
 
 			return db.watched.insert({
-				movie_id: data.imdb_id.toString(),
+				movie_id: data.id.toString(),
 				date: new Date(),
 				type: 'movie'
 			});
@@ -208,13 +238,13 @@ var Database = {
 
 	markMovieAsNotWatched: function (data, trakt) {
 		if (trakt !== false) {
-			App.Trakt.movie.unseen(data.imdb_id);
+			App.Trakt.movie.unseen(data.id);
 		}
 
-		App.watchedMovies.splice(App.watchedMovies.indexOf(data.imdb_id), 1);
+		App.watchedMovies.splice(App.watchedMovies.indexOf(data.id), 1);
 
 		return db.watched.remove({
-			movie_id: data.imdb_id.toString()
+			movie_id: data.id.toString()
 		});
 	},
 
@@ -222,7 +252,7 @@ var Database = {
 		win.warn('this isn\'t used anywhere');
 
 		return promisifyDb(db.watched.find({
-				movie_id: data.imdb_id.toString()
+				movie_id: data.id.toString()
 			}))
 			.then(function (data) {
 				return (data != null && data.length > 0);
@@ -232,6 +262,76 @@ var Database = {
 	getMoviesWatched: function () {
 		return promisifyDb(db.watched.find({
 			type: 'movie'
+		}));
+	},
+
+	/*******************************
+	 *******    Craigslist   ********
+	 *******************************/
+
+	addCity: function (data) {
+		return db.craigslistCities.insert(data);
+	},
+
+	addCities: function (data) {
+		var promises = data.cities.map(function (city) {
+			return Database.addCity({
+				city: city
+			});
+		});
+
+		return Q.all(promises);
+	},
+
+	deleteCity: function (id) {
+		return db.craigslistCities.remove({
+			id: id
+		});
+	},
+
+	getCraigslistCity: function (id) {
+		return promisifyDb(db.craigslistCities.findOne({
+			id: id
+		}));
+	},
+
+	getAllCraigslistCities: function () {
+		return promisifyDb(db.craigslistCities.find({}));
+	},
+
+	getCraigslistCategory: function (id) {
+		return promisifyDb(db.craigslistCategories.findOne({
+			id: id
+		}));
+	},
+
+	getAllCraigslistCategories: function () {
+		return promisifyDb(db.craigslistCategories.find({}));
+	},
+
+	addTicket: function (data) {
+		return db.craigslistTickets.insert(data);
+	},
+
+	addTickets: function (data) {
+		var promises = data.tickets.map(function (ticket) {
+			return Database.addTicket({
+				ticket: ticket
+			});
+		});
+
+		return Q.all(promises);
+	},
+
+	deleteTicket: function (id) {
+		return db.craigslistTickets.remove({
+			id: id
+		});
+	},
+
+	getTicket: function (id) {
+		return promisifyDb(db.craigslistTickets.findOne({
+			id: id
 		}));
 	},
 
@@ -261,14 +361,14 @@ var Database = {
 			}))
 			.then(function (response) {
 				if (response.length === 0) {
-					App.watchedShows.push(data.imdb_id.toString());
+					App.watchedShows.push(data.id.toString());
 				}
 			}).then(function () {
 
 
 				return db.watched.insert({
 					tvdb_id: data.tvdb_id.toString(),
-					imdb_id: data.imdb_id.toString(),
+					id: data.id.toString(),
 					season: data.season.toString(),
 					episode: data.episode.toString(),
 					type: 'episode',
@@ -301,13 +401,13 @@ var Database = {
 			}))
 			.then(function (response) {
 				if (response.length === 1) {
-					App.watchedShows.splice(App.watchedShows.indexOf(data.imdb_id.toString()), 1);
+					App.watchedShows.splice(App.watchedShows.indexOf(data.id.toString()), 1);
 				}
 			})
 			.then(function () {
 				return db.watched.remove({
 					tvdb_id: data.tvdb_id.toString(),
-					imdb_id: data.imdb_id.toString(),
+					id: data.id.toString(),
 					season: data.season.toString(),
 					episode: data.episode.toString()
 				});
@@ -320,7 +420,7 @@ var Database = {
 	checkEpisodeWatched: function (data) {
 		return promisifyDb(db.watched.find({
 				tvdb_id: data.tvdb_id.toString(),
-				imdb_id: data.imdb_id.toString(),
+				id: data.id.toString(),
 				season: data.season.toString(),
 				episode: data.episode.toString()
 			}))
@@ -349,9 +449,9 @@ var Database = {
 	},
 
 	// Used in bookmarks
-	deleteTVShow: function (imdb_id) {
+	deleteTVShow: function (id) {
 		return db.tvshows.remove({
-			imdb_id: imdb_id
+			id: id
 		});
 	},
 
@@ -365,9 +465,9 @@ var Database = {
 	},
 
 	// Used in bookmarks
-	getTVShowByImdb: function (imdb_id) {
+	getTVShowByImdb: function (id) {
 		return promisifyDb(db.tvshows.findOne({
-			imdb_id: imdb_id
+			id: id
 		}));
 	},
 
@@ -438,6 +538,10 @@ var Database = {
 
 	deleteDatabases: function () {
 
+		fs.unlinkSync(path.join(data_path, 'data/craigslist-cities.db'));
+
+		fs.unlinkSync(path.join(data_path, 'data/craigslist-tickets.db'));
+
 		fs.unlinkSync(path.join(data_path, 'data/watched.db'));
 
 		fs.unlinkSync(path.join(data_path, 'data/movies.db'));
@@ -467,7 +571,7 @@ var Database = {
 
 		// we'll intiatlize our settings and our API SSL Validation
 		// we build our settings array
-		return Database.getUserInfo()
+		var mainTask = Database.getUserInfo()
 			.then(Database.getSettings)
 			.then(function (data) {
 				if (data != null) {
@@ -483,13 +587,13 @@ var Database = {
 					window.__isNewInstall = true;
 				}
 
-				App.vent.trigger('initHttpApi');
+				// 	App.vent.trigger('initHttpApi');
 
-				return AdvSettings.checkApiEndpoints([
-					Settings.ytsAPI,
-					Settings.tvshowAPI,
-					Settings.updateEndpoint
-				]);
+				// 	return AdvSettings.checkApiEndpoints([
+				// 		Settings.ytsAPI,
+				// 		Settings.tvshowAPI,
+				// 		Settings.updateEndpoint
+				// 	]);
 			})
 			.then(function () {
 				// set app language
@@ -497,18 +601,30 @@ var Database = {
 				// set hardware settings and usefull stuff
 				return AdvSettings.setup();
 			})
-			.then(function () {
-				App.Trakt = App.Config.getProvider('metadata');
-				// check update
-				var updater = new App.Updater();
-				updater.update()
-					.catch(function (err) {
-						win.error(err);
-					});
-			})
+			// .then(function () {
+			// 	App.Trakt = App.Config.getProvider('metadata');
+			// 	// check update
+			// 	if (App.Updater) {
+			// 		var updater = new App.Updater();
+			// 		updater.update()
+			// 			.catch(function (err) {
+			// 				win.error(err);
+			// 			});
+			// 	}
+			// })
 			.catch(function (err) {
 				win.error('Error starting up');
 				win.error(err);
 			});
+
+		var craig = App.Providers.get('Craigslist');
+		var tasks = [
+			mainTask,
+			craig.loadRegions()
+			// ,
+			// craig.loadCategories()
+		];
+
+		return Q.all(tasks);
 	}
 };

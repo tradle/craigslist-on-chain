@@ -19,11 +19,32 @@ var parseBuildPlatforms = function (argumentPlatform) {
 	return buildPlatforms;
 };
 
+function renameApp(config, appName, appDName) {
+	appDName = appDName || appName.replace(/\s/, '-');
+	for (var p in config) {
+		var subConfig = config[p];
+		var newVal = subConfig;
+		switch (typeof subConfig) {
+		case 'string':
+			newVal = subConfig.replace(/Popcorn\ Time/g, appName).replace(/Popcorn\-Time/g, appDName);
+			break;
+		case 'object':
+			newVal = renameApp(subConfig, appName, appDName);
+			break;
+		}
+
+		config[p] = newVal;
+	}
+
+	return config;
+}
+
 module.exports = function (grunt) {
 	"use strict";
 
 	var buildPlatforms = parseBuildPlatforms(grunt.option('platforms'));
 	var pkgJson = grunt.file.readJSON('package.json');
+	var appName = pkgJson.window.title;
 	var currentVersion = pkgJson.version;
 
 	require('load-grunt-tasks')(grunt);
@@ -41,12 +62,12 @@ module.exports = function (grunt) {
 	]);
 
 	grunt.registerTask('css', [
-		'officalcss'
+		'officialcss'
 	]);
 
 	grunt.registerTask('themes', [
 		'shell:themes',
-		'unofficalcss'
+		'unofficialcss'
 	]);
 
 	grunt.registerTask('js', [
@@ -93,10 +114,10 @@ module.exports = function (grunt) {
 		}
 	});
 
-	grunt.registerTask('officalcss', [
-		'stylus:offical'
+	grunt.registerTask('officialcss', [
+		'stylus:official'
 	]);
-	grunt.registerTask('unofficalcss', [
+	grunt.registerTask('unofficialcss', [
 		'clean:css',
 		'stylus:third_party'
 	]);
@@ -131,10 +152,10 @@ module.exports = function (grunt) {
 		}
 	});
 
-	grunt.initConfig({
+	grunt.initConfig(renameApp({
 		githooks: {
 			all: {
-				'pre-commit': 'jsbeautifier:verify jshint',
+				'pre-commit': 'jsbeautifier:verify jshint'
 			}
 		},
 
@@ -169,7 +190,7 @@ module.exports = function (grunt) {
 				dest: 'src/app/themes/',
 				ext: '.css'
 			},
-			offical: {
+			official: {
 				options: {
 					'resolve url': true,
 					use: ['nib'],
@@ -190,7 +211,7 @@ module.exports = function (grunt) {
 				build_dir: './build', // Where the build version of my node-webkit app is saved
 				keep_nw: true,
 				embed_nw: false,
-				mac_icns: './src/app/images/popcorntime.icns', // Path to the Mac icon file
+				mac_icns: './src/app/images/logo.icns', // Path to the Mac icon file
 				macZip: buildPlatforms.win, // Zip nw for mac in windows. Prevent path too long if build all is used.
 				mac: buildPlatforms.mac,
 				win: buildPlatforms.win,
@@ -222,7 +243,7 @@ module.exports = function (grunt) {
 				cmd: 'sh dist/mac/codesign.sh || echo "Codesign failed, likely caused by not being run on mac, continuing"'
 			},
 			createDmg: {
-				cmd: 'dist/mac/yoursway-create-dmg/create-dmg --volname "Popcorn Time ' + currentVersion + '" --background ./dist/mac/background.png --window-size 480 540 --icon-size 128 --app-drop-link 240 370 --icon "Popcorn-Time" 240 110 ./build/releases/Popcorn-Time/mac/Popcorn-Time-' + currentVersion + '-Mac.dmg ./build/releases/Popcorn-Time/mac/ || echo "Create dmg failed, likely caused by not being run on mac, continuing"'
+				cmd: 'dist/mac/yoursway-create-dmg/create-dmg --volname "' + appName + ' ' + currentVersion + '" --background ./dist/mac/background.png --window-size 480 540 --icon-size 128 --app-drop-link 240 370 --icon "Popcorn-Time" 240 110 ./build/releases/Popcorn-Time/mac/Popcorn-Time-' + currentVersion + '-Mac.dmg ./build/releases/Popcorn-Time/mac/ || echo "Create dmg failed, likely caused by not being run on mac, continuing"'
 			},
 			createWinInstall: {
 				cmd: 'makensis dist/windows/installer_makensis.nsi',
@@ -371,6 +392,6 @@ module.exports = function (grunt) {
 			}
 		}
 
-	});
+	}, appName));
 
 };

@@ -1,10 +1,11 @@
-<img class="icon-begin" src="/src/app/images/icon.png">
-<img class="init-icon-title" src="/src/app/images/icons/big-logo.png">
+<img class="icon-begin init-popin" src="/src/app/images/icon.png">
+<br />
+<!--img class="init-icon-title" src="/src/app/images/icons/big-logo.png"-->
 <div class="init-geek-line">
 	<%= i18n.__("Made with") %> <span style="color:#e74c3c;">&#10084;</span> <%= i18n.__("by a bunch of geeks from All Around The World") %>
 </div>
 <div class="text-begin">
-	<div class="init-text"><%= i18n.__("Initializing PopcornTime. Please Wait...") %></div>
+	<div class="init-text"><%= i18n.__("Initializing " + App.Config.title + ". Please Wait...") %></div>
 	<div class="init-progressbar">
 		<div id="initbar-contents"></div>
 	</div>

@@ -3,25 +3,34 @@
 ## Version 0.1.1
 ##
 ## Usage
-## ./make_popcorn.sh [url]
+## ./make_craigslist.sh [url]
 ##
-## The script make_popcorn.sh allows you to clone, setup, and build a version of popcorn time
+## The script make.sh allows you to clone, setup, and build a version of this app
 ## The [url] handle is optional and allows you to pick what repository you wish to clone
 ## If you use 'ssh' in the place of the optional [url] parameter, it will clone via ssh instead of http
 ##
 ## Optionally, you can also pass in a specific branch to build or clone, by making url contain a branch specifier
-## ./make_popcorn.sh '-b release/0.3.4 https://git.popcorntime.io/stash/scm/pt/popcorn-app.git'
+## ./make.sh '-b release/0.3.4 https://github.com/tradle/craigslist-on-chain.git'
 ##
 
 
 clone_repo="True"
 if [ -z "${1}" ]; then
-    clone_url="https://git.popcorntime.io/stash/scm/pt/popcorn-app.git"
-elif [ "${1}" = "ssh" ]; then
-    clone_url="ssh://git@git.popcorntime.io/pt/popcorn-app.git"
+    clone_url="https://github.com/tradle/craigslist-on-chain.git"
 else
     clone_url="${1}"
 fi
+
+execcommand() {
+    case ${OSTYPE} in msys*)
+       echo $OSTYPE
+       $1
+       ;;
+    *)
+        $1
+       ;;
+    esac
+}
 
 execsudo() {
     case ${OSTYPE} in msys*)
@@ -36,9 +45,9 @@ execsudo() {
 
 clone_command() {
     if git clone ${clone_url} ${dir}; then
-        echo "Cloned Popcorn Time successfully"
+        echo "Cloned Craigslist on Chain successfully"
     else
-        echo "Popcorn Time encountered an error and could not be cloned"
+        echo "Craigslist on Chain encountered an error and could not be cloned"
         exit 2
     fi
 }
@@ -46,7 +55,7 @@ clone_command() {
 if [ -e ".git/config" ]; then
     dat=`cat .git/config | grep 'url'`
     case ${dat} in *popcorn-app*)
-        echo "You appear to be inside of a Popcorn Time repository already, not cloning"
+        echo "You appear to be inside of a Craigslist on Chain repository already, not cloning"
         clone_repo="False"
         ;;
     *)
@@ -68,7 +77,7 @@ if [ -e ".git/config" ]; then
             fi
         done
         if [ "$rd_cln" = "no" ]; then
-            echo "You appear to be inside of a Popcorn Time repository already, not cloning"
+            echo "You appear to be inside of a Craigslist on Chain repository already, not cloning"
             clone_repo="False"
         else
             echo "You've chosen to clone inside the current directory"
@@ -77,8 +86,8 @@ if [ -e ".git/config" ]; then
     esac
 fi
 if [ "${clone_repo}" = "True" ]; then
-    echo "Cloning Popcorn Time"
-    read -p "Where do you wish to clone popcorn time to? [popcorn-app] " dir
+    echo "Cloning Craigslist on Chain"
+    read -p "Where do you wish to clone Craigslist on Chain to? [popcorn-app] " dir
     if [ -z "${dir}" ]; then
         dir='popcorn-app'
     elif [ "${dir}" = "/" ]; then
@@ -123,7 +132,7 @@ fi
 try="True"
 tries=0
 while [ "${try}" = "True" ]; do
-    read -p "Do you wish to install the required dependencies for Popcorn Time and setup for building? (yes/no) [yes] " rd_dep
+    read -p "Do you wish to install the required dependencies for Craigslist on Chain and setup for building? (yes/no) [yes] " rd_dep
     if [ -z "${rd_dep}" ]; then
         rd_dep="yes"
     fi
@@ -146,7 +155,7 @@ echo "Switched to ${PWD}"
 
 if [ "${rd_dep}" = "yes" ]; then
     echo "Installing global dependencies"
-    if execsudo "npm install -g bower grunt-cli"; then
+    if execcommand "npm install -g bower grunt-cli"; then
         echo "Global dependencies installed successfully!"
     else
         echo "Global dependencies encountered an error while installing"
@@ -154,7 +163,7 @@ if [ "${rd_dep}" = "yes" ]; then
     fi
 
     echo "Installing local dependencies"
-    if execsudo "npm install"; then
+    if execcommand "npm install"; then
         echo "Local dependencies installed successfully!"
     else
         echo "Local dependencies encountered an error while installing"
@@ -165,7 +174,7 @@ if [ "${rd_dep}" = "yes" ]; then
     case ${OSTYPE} in msys*)
         ;;
         *)
-        if execsudo "chown -R $USER ." && execsudo "chown -R $USER $curh/.cache"; then
+        if execcommand "chown -R $USER ." && execcommand "chown -R $USER $curh/.cache"; then
             echo "Local permissions corrected successfully!"
         else
             echo "Local permissions encountered an error while correcting"
@@ -182,14 +191,14 @@ if [ "${rd_dep}" = "yes" ]; then
         exit 4
     fi
 
-    echo "Successfully setup for Popcorn Time"
+    echo "Successfully setup for Craigslist on Chain"
 fi
 
 if grunt build; then
-    echo "Popcorn Time built successfully!"
+    echo "Craigslist on Chain built successfully!"
     echo "Run 'grunt start' from inside the repository to launch the app"
     echo "Enjoy!"
 else
-    echo "Popcorn Time encountered an error and couldn't be built"
+    echo "Craigslist on Chain encountered an error and couldn't be built"
     exit 5
 fi

@@ -6,7 +6,8 @@
 	"devel"    : true,
 	
 	// Options
-	"curly"    : true,
+	"asi"			 : true,
+	"curly"    : false,
 	"bitwise"  : false,
 	"immed"    : true,
 	"latedef"  : true,
@@ -15,7 +16,7 @@
 	"validthis": true,
 	"debug"    : true,
 	"boss"     : true,
-	"eqeqeq"   : true,
+	"eqeqeq"   : false,
 	"expr"     : true,
 	"eqnull"   : true,
 	"quotmark" : "single",

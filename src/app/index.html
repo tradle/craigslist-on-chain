@@ -23,6 +23,8 @@
 	<script id="settings-container-tpl" src="templates/settings-container.tpl" type="text/x-template"></script>
 	<script id="header-tpl" src="templates/header.tpl" type="text/x-template"></script>
 	<script id="movie-detail-tpl" src="templates/movie-detail.tpl" type="text/x-template"></script>
+	<script id="ticket-detail-tpl" src="templates/ticket-detail.tpl" type="text/x-template"></script>
+	<script id="identity-detail-tpl" src="templates/identity-detail.tpl" type="text/x-template"></script>
 	<script id="show-detail-tpl" src="templates/show-detail.tpl" type="text/x-template"></script>
 	<script id="player-tpl" src="templates/player.tpl" type="text/x-template"></script>
 	<script id="player-subtitles" src="templates/player-subtitles.tpl" type="text/x-template"></script>
@@ -58,30 +60,34 @@
 	<script src="common.js"></script>
 	<script src="app.js"></script>
 	<script src="lib/config.js"></script>
-	<script src="updater.js"></script>
-	<script src="httpapi.js"></script>
+	<!--script src="updater.js"></script-->
+	<!--script src="httpapi.js"></script-->
 	<script src="language.js"></script>
 	<script src="lib/streamer.js"></script>
 
-	<script src="lib/device/generic.js"></script>
+	<!--script src="lib/device/generic.js"></script>
 	<script src="lib/device/airplay.js"></script>
 	<script src="lib/device/chromecast.js"></script>
 	<script src="lib/device/external.js"></script>
 
 	<script src="lib/subtitle/generic.js"></script>
-	<script src="lib/subtitle/server.js"></script>
+	<script src="lib/subtitle/server.js"></script-->
 
 	<!-- Backbone Models -->
 	<script src="lib/models/filter.js"></script>
+	<script src="lib/models/listing.js"></script>
+	<script src="lib/models/identity.js"></script>
 	<script src="lib/models/movie.js"></script>
-    <script src="lib/models/show.js"></script>
+  <script src="lib/models/show.js"></script>
 	<script src="lib/models/generic_collection.js"></script>
+	<script src="lib/models/ticket_collection.js"></script>
+	<script src="lib/models/identity_collection.js"></script>
 	<script src="lib/models/movie_collection.js"></script>
 	<script src="lib/models/stream_info.js"></script>
 	<script src="lib/models/show_collection.js"></script>
-    <script src="lib/models/anime_collection.js"></script>
+  <script src="lib/models/anime_collection.js"></script>
 	<script src="lib/models/favorite_collection.js"></script>
-    <script src="lib/models/watchlist_collection.js"></script>
+  <script src="lib/models/watchlist_collection.js"></script>
 
 	<!-- Data Sources -->
 	<script src="lib/cache.js"></script>
@@ -93,18 +99,22 @@
 	<script src="lib/providers/trakttv.js"></script>
 	<script src="lib/providers/yts.js"></script>
 	<script src="lib/providers/eztv.js"></script>
-    <script src="lib/providers/haruhichan.js"></script>
+  <script src="lib/providers/haruhichan.js"></script>
 	<script src="lib/providers/favorites.js"></script>
-    <script src="lib/providers/watchlist.js"></script>
+  <script src="lib/providers/watchlist.js"></script>
 	<script src="lib/providers/opensubtitles.js"></script>
 
 	<script src="lib/providers/torrent_cache.js"></script>
+	<script src="lib/providers/craigslist.js"></script>
+	<script src="lib/providers/identity.js"></script>
 
 	<!-- Backbone Views and Controllers -->
 	<script src="lib/views/title_bar.js"></script>
 	<script src="lib/views/main_window.js"></script>
 
 	<script src="lib/views/movie_detail.js"></script>
+	<script src="lib/views/ticket_detail.js"></script>
+	<script src="lib/views/identity_detail.js"></script>
 	<script src="lib/views/show_detail.js"></script>
 
 	<script src="lib/views/settings.js"></script>
@@ -117,17 +127,19 @@
 	<script src="lib/views/player/loading.js"></script>
 	<script src="lib/views/player/player.js"></script>
 
-    <script src="lib/views/browser/generic_browser.js"></script>
+  <script src="lib/views/browser/generic_browser.js"></script>
+	<script src="lib/views/browser/ticket_browser.js"></script>
+	<script src="lib/views/browser/identity_browser.js"></script>
 	<script src="lib/views/browser/movie_browser.js"></script>
 	<script src="lib/views/browser/filter_bar.js"></script>
 	<script src="lib/views/browser/item.js"></script>
 	<script src="lib/views/browser/list.js"></script>
 
 	<script src="lib/views/browser/show_browser.js"></script>
-    <script src="lib/views/browser/anime_browser.js"></script>
+  <script src="lib/views/browser/anime_browser.js"></script>
 
 	<script src="lib/views/browser/favorite_browser.js"></script>
-    <script src="lib/views/browser/watchlist_browser.js"></script>
+  <script src="lib/views/browser/watchlist_browser.js"></script>
 
 	<script src="bootstrap.js"></script>
 </body>

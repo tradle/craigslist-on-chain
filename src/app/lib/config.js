@@ -2,7 +2,7 @@
 	'use strict';
 
 	var Config = {
-		title: 'Popcorn Time',
+		title: gui.App.manifest.window.title,
 		platform: process.platform,
 		genres: [
 			'All',
@@ -128,6 +128,15 @@
 			'Western'
 		],
 
+		// types_tickets: [
+		// 	'All',
+		// 	'Concert',
+		// 	'Opera'
+		// ],
+
+		craigslist_cities: [],
+		craigslist_categories: [],
+
 		cache: {
 			name: 'cachedb',
 			version: '1.7',
@@ -143,14 +152,17 @@
 		},
 
 		providers: {
-			movie: ['Yts'],
-			tvshow: ['Eztv'],
-			anime: ['Haruhichan'],
-			subtitle: 'YSubs',
-			metadata: 'Trakttv',
+			identity: 'Identity',
+			ticket: 'Craigslist'
+				// ,
+				// movie: ['Yts'],
+				// tvshow: ['Eztv'],
+				// anime: ['Haruhichan'],
+				// subtitle: 'YSubs',
+				// metadata: 'Trakttv',
 
-			tvshowsubtitle: 'OpenSubtitles',
-			torrentCache: 'TorrentCache'
+			// tvshowsubtitle: 'OpenSubtitles',
+			// torrentCache: 'TorrentCache'
 		},
 
 		getProvider: function (type) {

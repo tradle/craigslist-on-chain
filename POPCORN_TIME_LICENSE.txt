@@ -1,8 +1,8 @@
-Tradle, Inc. - Craigslist on Chain
-Copyright © 2014  Tradle, Inc. and the contributors (tradle.io)
+Popcorn Time - Streaming video through torrents
+Copyright © 2014  Popcorn Time and the contributors (popcorntime.io)
  
 If you distribute a copy or make a fork of the project, you have to credit this project as source.
-  
+	
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
@@ -16,12 +16,12 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see http://www.gnu.org/licenses/ .
  
-If you want to contact us : info@tradle.io
+If you want to contact us : hello@popcorntime.io
  
  
-Tradle, Inc. - Craigslist on Chain
-Copyright © 2014  Tradle, Inc. and the contributors (tradle.io)
-Craigslist on Chain is released under the GPL
+Popcorn Time - Streaming video through torrents
+Copyright © 2014  Popcorn Time and the contributors (popcorntime.io)
+Popcorn Time is released under the GPL
 
 Last update: May 4, 2014
  
@@ -650,6 +650,6 @@ copy of the Program in return for a fee.
 END OF TERMS AND CONDITIONS
  
 The source code for any program binaries or compressed scripts that are
-included with Craigslist on Chain can be freely obtained at the following URL:
+included with Popcorn Time can be freely obtained at the following URL:
  
-https://github.com/tradle/craigslist-on-chain
+https://git.popcorntime.io/

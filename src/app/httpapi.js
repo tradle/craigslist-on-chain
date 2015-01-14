@@ -656,6 +656,7 @@
 	}
 
 	function closeServer(cb) {
+		console.log('Closing server');
 		httpServer.close(function () {
 			cb();
 		});
@@ -685,5 +686,7 @@
 				}
 			});
 	});
+
+	App.vent.on('close', closeServer);
 
 })(window.App);

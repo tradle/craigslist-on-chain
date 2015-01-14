@@ -10,8 +10,14 @@
 		},
 
 		events: {
-			'click .close-icon': 'closeAbout',
-			'click .links': 'links'
+			'click .close-icon': 'closeAbout'
+		},
+
+		templateHelpers: {
+			paragraphs: [
+				'Extending the bitcoin blockchain to non-financial transactions',
+				'Enabling premissionless commerce'
+			]
 		},
 
 		onShow: function () {
@@ -35,11 +41,6 @@
 
 		closeAbout: function () {
 			App.vent.trigger('about:close');
-		},
-
-		links: function (e) {
-			e.preventDefault();
-			gui.Shell.openExternal($(e.currentTarget).attr('href'));
 		}
 
 	});

@@ -27,7 +27,6 @@
 			this.collection.fetch();
 
 			this.listenTo(this.filter, 'change', this.onFilterChange);
-
 		},
 
 		onShow: function () {

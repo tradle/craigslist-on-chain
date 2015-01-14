@@ -11,6 +11,8 @@
 			searchClear: '.search .clear',
 			sorterValue: '.sorters .value',
 			typeValue: '.types .value',
+			cityValue: '.cities .value',
+			// categoryValue: '.categories .value',
 			genreValue: '.genres  .value'
 		},
 		events: {
@@ -21,9 +23,13 @@
 			'click  @ui.search': 'focusSearch',
 			'click .sorters .dropdown-menu a': 'sortBy',
 			'click .genres .dropdown-menu a': 'changeGenre',
+			'click .cities .dropdown-menu a': 'changeCity',
+			// 'click .categories .dropdown-menu a': 'changeCategory',
 			'click .types .dropdown-menu a': 'changeType',
 			'click #filterbar-settings': 'settings',
 			'click #filterbar-about': 'about',
+			'click .showTickets': 'showTickets',
+			'click .showIdentities': 'showIdentities',
 			'click .showMovies': 'showMovies',
 			'click .showShows': 'showShows',
 			'click .showAnime': 'showAnime',
@@ -32,18 +38,24 @@
 			'click .triggerUpdate': 'updateDB'
 		},
 
-
 		focus: function (e) {
 			e.focus();
 		},
 		setactive: function (set) {
-
 			if (AdvSettings.get('startScreen') === 'Last Open') {
 				AdvSettings.set('lastTab', set);
 			}
 
 			$('.filter-bar').find('.active').removeClass('active');
 			switch (set) {
+			case 'Tickets':
+			case 'tickets':
+				$('.source.showTickets').addClass('active');
+				break;
+			case 'Identities':
+			case 'identities':
+				$('.source.showIdentities').addClass('active');
+				break;
 			case 'TV Series':
 			case 'shows':
 				$('.source.showShows').addClass('active');
@@ -120,6 +132,12 @@
 			if (typeof App.currentview === 'undefined') {
 
 				switch (activetab) {
+				case 'Identities':
+					App.currentview = 'identities';
+					break;
+				case 'Tickets':
+					App.currentview = 'tickets';
+					break;
 				case 'TV Series':
 					App.currentview = 'shows';
 					break;
@@ -243,6 +261,34 @@
 			});
 		},
 
+		changeCity: function (e) {
+			App.vent.trigger('about:close');
+			this.$('.cities .active').removeClass('active');
+			$(e.target).addClass('active');
+
+			var city = $(e.target).attr('data-value');
+			this.ui.cityValue.text(i18n.__(city));
+
+			this.model.set({
+				keyword: '',
+				city: city
+			});
+		},
+
+		changeCategory: function (e) {
+			App.vent.trigger('about:close');
+			this.$('.categories .active').removeClass('active');
+			$(e.target).addClass('active');
+
+			var category = $(e.target).attr('data-value');
+			this.ui.categoryValue.text(i18n.__(category));
+
+			this.model.set({
+				keyword: '',
+				category: category
+			});
+		},
+
 		settings: function (e) {
 			App.vent.trigger('about:close');
 			App.vent.trigger('settings:show');
@@ -251,6 +297,24 @@
 
 		about: function (e) {
 			App.vent.trigger('about:show');
+		},
+
+		showTickets: function (e) {
+			e.preventDefault();
+
+			App.currentview = 'tickets';
+			App.vent.trigger('about:close');
+			App.vent.trigger('tickets:list', []);
+			this.setactive('Tickets');
+		},
+
+		showIdentities: function (e) {
+			e.preventDefault();
+
+			App.currentview = 'identities';
+			App.vent.trigger('about:close');
+			App.vent.trigger('identities:list', []);
+			this.setactive('Identities');
 		},
 
 		showShows: function (e) {
