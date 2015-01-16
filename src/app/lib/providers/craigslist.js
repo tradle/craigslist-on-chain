@@ -109,9 +109,13 @@
 			// item.year = moment(item.date).year();
 			_.extend(item, common);
 			item.images = {};
-			var img = item.pic || DEFAULT_IMG;
+			if (item.pics) {
+				item.images.poster = item.pics[0];
+				item.images.more = item.pics.slice(1);
+			}
+			else
+				item.images.poster = DEFAULT_IMG;
 
-			item.images.poster = img;
 			return item;
 		});
 
